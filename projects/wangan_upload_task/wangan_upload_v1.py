@@ -1,6 +1,7 @@
 #!/usr/bin/python
 #version 1.0
 
+#pip install timeout-decorator
 import ConfigParser
 import os,shutil
 import datetime,time
@@ -87,6 +88,7 @@ class Wangan(object):
     def get_config(self):
         return self.config
     
+    @timeout_decorator.timeout(30)
     def backupfile(self,abfile):
         back_dir = self.config['back_dir']
         src_dir = self.config['src_dir']
@@ -97,10 +99,7 @@ class Wangan(object):
             os.makedirs(backfile[0:end])
         except OSError as why:
             logger.warn('%s',why)
-        try:
-            shutil.move(abfile,backfile)
-        except :
-            logger.exception('%s backup failed',abfile)
+        shutil.move(abfile,backfile)
                  
     def scan(self,first_scan=False):
         daydir = src_dir = self.config['src_dir']
@@ -131,7 +130,10 @@ class Wangan(object):
             upload_info['filepath'] = abfile
             result = ftpuploader.uploadfile(path2file,abfile)
             upload_info['state'] = result
-            self.backupfile(abfile) 
+            try:
+                self.backupfile(abfile)
+            except:
+                logger.exception('%s backup failed',abfile)
             #self.writeinfo(upload_info)
 
     def go(self):
