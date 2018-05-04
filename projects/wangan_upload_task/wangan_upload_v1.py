@@ -7,6 +7,7 @@ import os,shutil
 import datetime,time
 from ftplib import FTP,error_perm,all_errors
 import logging,sys
+import timeout_decorator
 
 logger = logging.getLogger("Wangan")
 formatter = logging.Formatter('%(asctime)s %(levelname)-8s: %(message)s')
